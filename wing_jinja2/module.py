@@ -1,5 +1,6 @@
+from wing_module import Module
+
 import jinja2
-import os
 
 
 class SilentUndefined(jinja2.Undefined):
@@ -7,9 +8,8 @@ class SilentUndefined(jinja2.Undefined):
         return None
 
 
-class Jinja2(object):
-    def __init__(self, app, **config):
-        self.app = app
+class Jinja2(Module):
+    def init(self, config):
         self.root_dir = config.get('root_dir')
         self._loader = jinja2.FileSystemLoader(self.root_dir)
         self.env = jinja2.Environment(
