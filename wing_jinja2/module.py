@@ -1,6 +1,11 @@
+from drongo import exceptions
+
 from wing_module import Module
 
 import jinja2
+
+
+__all__ = ['Jinja2']
 
 
 class SilentUndefined(jinja2.Undefined):
@@ -27,7 +32,21 @@ class Jinja2(Module):
     def after(self, ctx):
         if '__drongo_template' in ctx:
             ctx.response.set_content(
-                self.get_template(ctx['__drongo_template']).render(ctx))
+                self.get_template(ctx['__drongo_template']).render(ctx)
+            )
+
+    def exception(self, ctx, exc):
+        try:
+            if isinstance(exc, exceptions.NotFoundException):
+                templ = self.get_template('404.html')
+            else:
+                templ = self.get_template('500.html')
+
+            ctx.response.set_content(
+                templ.render(ctx)
+            )
+        except Exception:
+            pass
 
     @classmethod
     def template(cls, name):
