@@ -3,6 +3,7 @@ from drongo import exceptions
 from wing_module import Module
 
 import jinja2
+import logging
 
 
 __all__ = ['Jinja2']
@@ -14,7 +15,13 @@ class SilentUndefined(jinja2.Undefined):
 
 
 class Jinja2(Module):
+    logger = logging.getLogger('wing_jinja2')
+
     def init(self, config):
+        self.logger.info('Initializing [jinja2] module.')
+
+        self.app.context.modules.jinja2 = self
+
         self.root_dir = config.get('root_dir')
         self._loader = jinja2.FileSystemLoader(self.root_dir)
         self.env = jinja2.Environment(
