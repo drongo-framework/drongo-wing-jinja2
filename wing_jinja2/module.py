@@ -37,9 +37,16 @@ class Jinja2(Module):
         return self.env.get_template(name)
 
     def after(self, ctx):
+        template = None
         if '__drongo_template' in ctx:
+            template = ctx['__drongo_template']
+
+        elif hasattr(ctx.callable, '__drongo_template'):
+            template = getattr(ctx.callable, '__drongo_template')
+
+        if template:
             ctx.response.set_content(
-                self.get_template(ctx['__drongo_template']).render(ctx)
+                self.get_template(template).render(ctx)
             )
 
     def exception(self, ctx, exc):
@@ -58,10 +65,6 @@ class Jinja2(Module):
     @classmethod
     def template(cls, name):
         def _inner1(method):
-            def _inner2(*args, **kwargs):
-                ctx = args[-1]
-                ctx['__drongo_template'] = name
-                result = method(*args, **kwargs)
-                return result
-            return _inner2
+            setattr(method, '__drongo_template', name)
+            return method
         return _inner1
