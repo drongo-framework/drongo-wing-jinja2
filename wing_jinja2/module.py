@@ -45,9 +45,9 @@ class Jinja2(Module):
     def exception(self, ctx, exc):
         try:
             if isinstance(exc, exceptions.NotFoundException):
-                templ = self.get_template('404.html')
+                templ = self.get_template('404.html.j2')
             else:
-                templ = self.get_template('500.html')
+                templ = self.get_template('500.html.j2')
 
             ctx.response.set_content(
                 templ.render(ctx)
