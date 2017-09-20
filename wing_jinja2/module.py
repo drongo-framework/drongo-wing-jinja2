@@ -17,6 +17,8 @@ class SilentUndefined(jinja2.Undefined):
 class Jinja2(Module):
     logger = logging.getLogger('wing_jinja2')
 
+    _view_templates = {}
+
     def init(self, config):
         self.logger.info('Initializing [jinja2] module.')
 
@@ -44,6 +46,9 @@ class Jinja2(Module):
         elif hasattr(ctx.callable, '__drongo_template'):
             template = getattr(ctx.callable, '__drongo_template')
 
+        elif ctx.callable in self._view_templates:
+            template = self._view_templates[ctx.callable]
+
         if template:
             ctx.response.set_content(
                 self.get_template(template).render(ctx)
@@ -68,3 +73,8 @@ class Jinja2(Module):
             setattr(method, '__drongo_template', name)
             return method
         return _inner1
+
+    @classmethod
+    def template_view(cls, klass):
+        cls._view_templates[klass.do] = getattr(klass, '__template__')
+        return klass
